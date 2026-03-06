@@ -1,5 +1,4 @@
 import type { SearchResult } from "@/features/location/domain/types";
-import { parseLocationParts } from "@/shared/utils/location";
 
 /* ────── Form state ────── */
 
@@ -33,13 +32,21 @@ export interface PosterState {
   isLocationFocused: boolean;
   selectedLocation: SearchResult | null;
   userLocation: SearchResult | null;
+  displayNameOverrides: {
+    city: boolean;
+    country: boolean;
+  };
 }
 
 /* ────── Actions ────── */
 
 export type PosterAction =
   | { type: "SET_FIELD"; name: string; value: string | boolean }
-  | { type: "SET_FORM_FIELDS"; fields: Partial<PosterForm> }
+  | {
+      type: "SET_FORM_FIELDS";
+      fields: Partial<PosterForm>;
+      resetDisplayNameOverrides?: boolean;
+    }
   | { type: "SET_THEME"; themeId: string }
   | { type: "SET_LAYOUT"; layoutId: string; widthCm: string; heightCm: string }
   | { type: "SET_COLOR"; key: string; value: string }
@@ -62,17 +69,30 @@ export function posterReducer(
   switch (action.type) {
     case "SET_FIELD": {
       const nextForm = { ...state.form, [action.name]: action.value };
+      const nextDisplayNameOverrides = { ...state.displayNameOverrides };
 
       if (action.name === "location" && typeof action.value === "string") {
-        const parts = parseLocationParts(action.value);
-        nextForm.displayCity = parts.city;
-        nextForm.displayCountry = parts.country;
-        nextForm.displayContinent = "";
+        nextDisplayNameOverrides.city = false;
+        nextDisplayNameOverrides.country = false;
+      }
+
+      if (action.name === "latitude" || action.name === "longitude") {
+        nextDisplayNameOverrides.city = false;
+        nextDisplayNameOverrides.country = false;
+      }
+
+      if (action.name === "displayCity") {
+        nextDisplayNameOverrides.city = true;
+      }
+
+      if (action.name === "displayCountry") {
+        nextDisplayNameOverrides.country = true;
       }
 
       return {
         ...state,
         form: nextForm,
+        displayNameOverrides: nextDisplayNameOverrides,
         // Clear selected location when location/lat/lon field changes
         ...(["location", "latitude", "longitude"].includes(action.name)
           ? { selectedLocation: null }
@@ -84,6 +104,9 @@ export function posterReducer(
       return {
         ...state,
         form: { ...state.form, ...action.fields },
+        displayNameOverrides: action.resetDisplayNameOverrides
+          ? { city: false, country: false }
+          : state.displayNameOverrides,
       };
 
     case "SET_THEME":
@@ -118,6 +141,7 @@ export function posterReducer(
         ...state,
         selectedLocation: action.location,
         isLocationFocused: false,
+        displayNameOverrides: { city: false, country: false },
         form: {
           ...state.form,
           location: action.location.label,
@@ -139,6 +163,7 @@ export function posterReducer(
       return {
         ...state,
         selectedLocation: null,
+        displayNameOverrides: { city: false, country: false },
         form: {
           ...state.form,
           location: "",

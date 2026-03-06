@@ -73,6 +73,10 @@ const INITIAL_STATE: PosterState = {
   isLocationFocused: false,
   selectedLocation: null,
   userLocation: null,
+  displayNameOverrides: {
+    city: false,
+    country: false,
+  },
 };
 
 /* ────── Context shape ────── */

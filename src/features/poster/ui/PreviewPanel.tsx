@@ -214,6 +214,7 @@ export default function PreviewPanel() {
     ) => {
       dispatch({
         type: "SET_FORM_FIELDS",
+        resetDisplayNameOverrides: true,
         fields: {
           ...(includeCoordinates
             ? {
@@ -256,6 +257,7 @@ export default function PreviewPanel() {
         dispatch({ type: "SET_USER_LOCATION", location: resolved });
         dispatch({
           type: "SET_FORM_FIELDS",
+          resetDisplayNameOverrides: true,
           fields: {
             displayCity: String(resolved.city ?? "").trim() || DEFAULT_CITY,
             displayCountry: String(resolved.country ?? "").trim() || DEFAULT_COUNTRY,
