@@ -7,6 +7,7 @@ import { useMapSync } from "@/features/map/application/useMapSync";
 
 import LocationSection from "@/features/location/ui/LocationSection";
 import MapSettingsSection from "@/features/map/ui/MapSettingsSection";
+import MarkersSection from "@/features/markers/ui/MarkersSection";
 import TypographySection from "@/features/poster/ui/TypographySection";
 import { DownloadIcon } from "@/shared/ui/Icons";
 
@@ -36,6 +37,8 @@ export default function SettingsPanel() {
   const { flyToLocation } = useMapSync();
 
   const [isColorEditorActive, setIsColorEditorActive] = useState(false);
+  const [isMarkerEditorActive, setIsMarkerEditorActive] = useState(false);
+  const isAuxEditorActive = isColorEditorActive || isMarkerEditorActive;
 
   const showLocationSuggestions =
     state.isLocationFocused && locationSuggestions.length > 0;
@@ -53,7 +56,7 @@ export default function SettingsPanel() {
 
   return (
     <form className="settings-panel" onSubmit={onSubmit}>
-      {!isColorEditorActive && (
+      {!isAuxEditorActive && (
         <LocationSection
           form={state.form}
           onChange={handleChange}
@@ -67,24 +70,30 @@ export default function SettingsPanel() {
         />
       )}
 
-      <MapSettingsSection
-        form={state.form}
-        onChange={handleChange}
-        onNumericFieldBlur={handleNumericFieldBlur}
-        onThemeChange={handleThemeChange}
-        onLayoutChange={handleLayoutChange}
-        selectedTheme={selectedTheme}
-        themeOptions={themeOptions}
-        layoutGroups={layoutGroups}
-        minPosterCm={MIN_POSTER_CM}
-        maxPosterCm={MAX_POSTER_CM}
-        customColors={state.customColors}
-        onColorChange={handleColorChange}
-        onResetColors={handleResetColors}
-        onColorEditorActiveChange={setIsColorEditorActive}
-      />
-
       {!isColorEditorActive && (
+        <MarkersSection onEditorActiveChange={setIsMarkerEditorActive} />
+      )}
+
+      {!isMarkerEditorActive && (
+        <MapSettingsSection
+          form={state.form}
+          onChange={handleChange}
+          onNumericFieldBlur={handleNumericFieldBlur}
+          onThemeChange={handleThemeChange}
+          onLayoutChange={handleLayoutChange}
+          selectedTheme={selectedTheme}
+          themeOptions={themeOptions}
+          layoutGroups={layoutGroups}
+          minPosterCm={MIN_POSTER_CM}
+          maxPosterCm={MAX_POSTER_CM}
+          customColors={state.customColors}
+          onColorChange={handleColorChange}
+          onResetColors={handleResetColors}
+          onColorEditorActiveChange={setIsColorEditorActive}
+        />
+      )}
+
+      {!isAuxEditorActive && (
         <TypographySection
           form={state.form}
           onChange={handleChange}
@@ -93,7 +102,7 @@ export default function SettingsPanel() {
         />
       )}
 
-      {!isColorEditorActive && (
+      {!isAuxEditorActive && (
         <div className="action-row">
           <div className="download-row">
             <button
@@ -118,7 +127,7 @@ export default function SettingsPanel() {
         </div>
       )}
 
-      {!isColorEditorActive && state.error && (
+      {!isAuxEditorActive && state.error && (
         <p className="error">{state.error}</p>
       )}
     </form>

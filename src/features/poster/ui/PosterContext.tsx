@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useReducer,
   useMemo,
   useRef,
@@ -19,6 +20,11 @@ import { generateMapStyle } from "@/features/map/infrastructure/maplibreStyle";
 import { useGeolocation } from "@/features/map/application/useGeolocation";
 import type { StyleSpecification } from "maplibre-gl";
 import type { MapInstanceRef } from "@/features/map/domain/types";
+import { createDefaultMarkerSettings } from "@/features/markers/infrastructure/helpers";
+import {
+  loadCustomMarkerIcons,
+  saveCustomMarkerIcons,
+} from "@/features/markers/infrastructure/customIconStorage";
 
 /* ────── Default form (moved from appConfig) ────── */
 
@@ -63,16 +69,28 @@ export const DEFAULT_FORM: PosterForm = {
   includeBuildings: false,
   includeWater: true,
   includeParks: true,
+  showMarkers: false,
 };
 
 const INITIAL_STATE: PosterState = {
   form: DEFAULT_FORM,
   customColors: {},
+  markers: [],
+  customMarkerIcons: [],
+  markerDefaults: {
+    ...createDefaultMarkerSettings(),
+    color: getTheme(defaultThemeName).ui.text,
+  },
+  isMarkerEditorActive: false,
   error: "",
   isExporting: false,
   isLocationFocused: false,
   selectedLocation: null,
   userLocation: null,
+  displayNameOverrides: {
+    city: false,
+    country: false,
+  },
 };
 
 /* ────── Context shape ────── */
@@ -93,6 +111,8 @@ const PosterContext = createContext<PosterContextValue | null>(null);
 export function PosterProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(posterReducer, INITIAL_STATE);
   const mapRef = useRef(null) as MapInstanceRef;
+  const lastSyncedMarkerThemeColorRef = useRef<string | null>(null);
+  const hasLoadedCustomIconsRef = useRef(false);
 
   // Set initial position from browser geolocation (or Hanover fallback)
   useGeolocation(dispatch);
@@ -108,6 +128,52 @@ export function PosterProvider({ children }: { children: ReactNode }) {
     }
     return applyThemeColorOverrides(selectedTheme, state.customColors);
   }, [selectedTheme, state.customColors]);
+
+  useEffect(() => {
+    const markerThemeColor = effectiveTheme.ui.text;
+    const previouslySynced = lastSyncedMarkerThemeColorRef.current;
+
+    if (previouslySynced === markerThemeColor) {
+      return;
+    }
+
+    lastSyncedMarkerThemeColorRef.current = markerThemeColor;
+    dispatch({
+      type: "SET_MARKER_DEFAULTS",
+      defaults: { color: markerThemeColor },
+      applyToMarkers: true,
+    });
+  }, [dispatch, effectiveTheme.ui.text]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void loadCustomMarkerIcons()
+      .then((icons) => {
+        if (isCancelled) {
+          return;
+        }
+        hasLoadedCustomIconsRef.current = true;
+        dispatch({ type: "SET_CUSTOM_MARKER_ICONS", icons });
+      })
+      .catch(() => {
+        hasLoadedCustomIconsRef.current = true;
+        // Ignore storage read failures.
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!hasLoadedCustomIconsRef.current) {
+      return;
+    }
+    void saveCustomMarkerIcons(state.customMarkerIcons).catch(() => {
+      // Ignore storage write failures.
+    });
+  }, [state.customMarkerIcons]);
 
   const mapStyle = useMemo(
     () =>

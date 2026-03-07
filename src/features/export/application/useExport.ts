@@ -3,6 +3,7 @@ import { usePosterContext } from "@/features/poster/ui/PosterContext";
 import { captureMapAsCanvas } from "@/features/export/infrastructure/mapExporter";
 import { compositeExport } from "@/features/poster/infrastructure/renderer";
 import { resolveCanvasSize } from "@/features/poster/infrastructure/renderer/canvas";
+import { getAllMarkerIcons } from "@/features/markers/infrastructure/iconRegistry";
 import { ensureGoogleFont } from "@/core/services";
 import {
   createPdfBlobFromCanvas,
@@ -28,6 +29,7 @@ import {
 export function useExport() {
   const { state, dispatch, effectiveTheme, mapRef } = usePosterContext();
   const { form } = state;
+  const hasVisibleMarkers = state.markers.length > 0;
 
   const exportPoster = useCallback(
     async (format: "png" | "pdf") => {
@@ -53,17 +55,18 @@ export function useExport() {
         const size = resolveCanvasSize(widthInches, heightInches);
 
         // 1. Capture map at full export resolution
-        const mapCanvas = await captureMapAsCanvas(
+        const { canvas: mapCanvas, markerProjection, markerScaleX, markerScaleY } =
+          await captureMapAsCanvas(
           map,
           size.width,
           size.height,
-        );
+          );
 
         // 2. Composite fades + text
         const lat = Number(form.latitude) || 0;
         const lon = Number(form.longitude) || 0;
 
-        const { canvas } = compositeExport(mapCanvas, {
+        const { canvas } = await compositeExport(mapCanvas, {
           theme: effectiveTheme,
           center: { lat, lon },
           widthInches,
@@ -73,6 +76,13 @@ export function useExport() {
           fontFamily: form.fontFamily.trim(),
           showPosterText: form.showPosterText,
           includeCredits: form.includeCredits,
+          markers: hasVisibleMarkers ? state.markers : [],
+          markerIcons: hasVisibleMarkers
+            ? getAllMarkerIcons(state.customMarkerIcons)
+            : [],
+          markerProjection: hasVisibleMarkers ? markerProjection : undefined,
+          markerScaleX: hasVisibleMarkers ? markerScaleX : undefined,
+          markerScaleY: hasVisibleMarkers ? markerScaleY : undefined,
         });
 
         // 3. Download
@@ -101,7 +111,15 @@ export function useExport() {
         dispatch({ type: "FAIL_EXPORT", error: message });
       }
     },
-    [mapRef, form, effectiveTheme, dispatch],
+    [
+      mapRef,
+      form,
+      effectiveTheme,
+      dispatch,
+      hasVisibleMarkers,
+      state.markers,
+      state.customMarkerIcons,
+    ],
   );
 
   const handleDownloadPng = useCallback(

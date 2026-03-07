@@ -1,4 +1,9 @@
 import type { ResolvedTheme } from "@/features/theme/domain/types";
+import type {
+  MarkerIconDefinition,
+  MarkerItem,
+  MarkerProjectionInput,
+} from "@/features/markers/domain/types";
 
 export interface CanvasSize {
   width: number;
@@ -20,6 +25,11 @@ export interface ExportOptions {
   fontFamily: string;
   showPosterText: boolean;
   includeCredits?: boolean;
+  markers?: MarkerItem[];
+  markerIcons?: MarkerIconDefinition[];
+  markerProjection?: MarkerProjectionInput;
+  markerScaleX?: number;
+  markerScaleY?: number;
 }
 
 export interface Typography {

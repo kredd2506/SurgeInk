@@ -1,5 +1,6 @@
 import { applyFades } from "./layers";
 import { drawPosterText } from "./typography";
+import { drawMarkersOnCanvas } from "@/features/markers/infrastructure/rendering";
 import type { ExportOptions, CanvasSize } from "../../domain/types";
 
 /**
@@ -11,10 +12,10 @@ import type { ExportOptions, CanvasSize } from "../../domain/types";
  *
  * Returns the composited canvas + its size metadata.
  */
-export function compositeExport(
+export async function compositeExport(
   mapCanvas: HTMLCanvasElement,
   options: ExportOptions,
-): { canvas: HTMLCanvasElement; size: CanvasSize } {
+): Promise<{ canvas: HTMLCanvasElement; size: CanvasSize }> {
   const {
     theme,
     center,
@@ -25,6 +26,11 @@ export function compositeExport(
     fontFamily,
     showPosterText = true,
     includeCredits = true,
+    markers = [],
+    markerIcons = [],
+    markerProjection,
+    markerScaleX = 1,
+    markerScaleY = 1,
   } = options;
 
   const width = mapCanvas.width;
@@ -43,7 +49,19 @@ export function compositeExport(
   // 2. Gradient fades
   applyFades(ctx, width, height, theme.ui.bg);
 
-  // 3. Poster text
+  // 3. Markers
+  if (markers.length > 0 && markerIcons.length > 0 && markerProjection) {
+    await drawMarkersOnCanvas(
+      ctx,
+      markers,
+      markerIcons,
+      markerProjection,
+      markerScaleX,
+      markerScaleY,
+    );
+  }
+
+  // 4. Poster text
   drawPosterText(
     ctx,
     width,
