@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { usePosterContext } from "@/features/poster/ui/PosterContext";
 import { useFormHandlers } from "@/features/poster/application/useFormHandlers";
 import { useExport } from "@/features/export/application/useExport";
@@ -9,7 +9,7 @@ import LocationSection from "@/features/location/ui/LocationSection";
 import MapSettingsSection from "@/features/map/ui/MapSettingsSection";
 import MarkersSection from "@/features/markers/ui/MarkersSection";
 import TypographySection from "@/features/poster/ui/TypographySection";
-import { DownloadIcon } from "@/shared/ui/Icons";
+import { DownloadIcon, LoaderIcon } from "@/shared/ui/Icons";
 
 import { themeOptions } from "@/features/theme/infrastructure/themeRepository";
 import { layoutGroups } from "@/features/layout/infrastructure/layoutRepository";
@@ -37,7 +37,7 @@ export default function SettingsPanel() {
     setLocationFocused,
     handleCreditsChange,
   } = useFormHandlers();
-  const { handleDownloadPng, handleDownloadPdf } = useExport();
+  const { handleDownloadPng, handleDownloadPdf, handleDownloadSvg } = useExport();
   const { locationSuggestions, isLocationSearching } = useLocationAutocomplete(
     state.form.location,
     state.isLocationFocused,
@@ -49,6 +49,9 @@ export default function SettingsPanel() {
   const [isLocatingUser, setIsLocatingUser] = useState(false);
   const [locationPermissionMessage, setLocationPermissionMessage] =
     useState("");
+  const [activeExportFormat, setActiveExportFormat] = useState<
+    "png" | "pdf" | "svg" | null
+  >(null);
   const isAuxEditorActive = isColorEditorActive || isMarkerEditorActive;
 
   const showLocationSuggestions =
@@ -147,6 +150,42 @@ export default function SettingsPanel() {
     requestPosition(false);
   };
 
+  const exportButtons = [
+    {
+      id: "png",
+      label: "PNG",
+      className: "generate-btn download-format-btn",
+      onClick: () => {
+        setActiveExportFormat("png");
+        handleDownloadPng();
+      },
+    },
+    {
+      id: "pdf",
+      label: "PDF",
+      className: "ghost download-format-btn",
+      onClick: () => {
+        setActiveExportFormat("pdf");
+        handleDownloadPdf();
+      },
+    },
+    {
+      id: "svg",
+      label: "SVG",
+      className: "download-format-btn export-map-btn",
+      onClick: () => {
+        setActiveExportFormat("svg");
+        handleDownloadSvg();
+      },
+    },
+  ] as const;
+
+  useEffect(() => {
+    if (!state.isExporting) {
+      setActiveExportFormat(null);
+    }
+  }, [state.isExporting]);
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // No generation step needed — the poster is always live
@@ -205,25 +244,28 @@ export default function SettingsPanel() {
 
       {!isAuxEditorActive && (
         <div className="action-row">
+          <p className="export-map-label">Export Map</p>
           <div className="download-row">
-            <button
-              type="button"
-              className="generate-btn download-format-btn"
-              onClick={handleDownloadPng}
-              disabled={state.isExporting}
-            >
-              <DownloadIcon className="download-btn-icon" />
-              <span>{state.isExporting ? "Exporting..." : "Export PNG"}</span>
-            </button>
-            <button
-              type="button"
-              className="ghost download-format-btn"
-              onClick={handleDownloadPdf}
-              disabled={state.isExporting}
-            >
-              <DownloadIcon className="download-btn-icon" />
-              <span>Export PDF</span>
-            </button>
+            {exportButtons.map((button) => (
+              <button
+                key={button.id}
+                type="button"
+                className={button.className}
+                onClick={button.onClick}
+                disabled={state.isExporting}
+              >
+                {state.isExporting && activeExportFormat === button.id ? (
+                  <LoaderIcon className="download-btn-icon is-spinning" />
+                ) : (
+                  <DownloadIcon className="download-btn-icon" />
+                )}
+                <span>
+                  {state.isExporting && activeExportFormat === button.id
+                    ? "Exporting..."
+                    : button.label}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       )}

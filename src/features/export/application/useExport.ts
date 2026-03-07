@@ -8,6 +8,7 @@ import { ensureGoogleFont } from "@/core/services";
 import {
   createPngBlob,
   createPdfBlobFromCanvas,
+  createLayeredSvgBlobFromMap,
   createPosterFilename,
   triggerDownloadBlob,
 } from "@/core/services";
@@ -33,7 +34,7 @@ export function useExport() {
   const hasVisibleMarkers = form.showMarkers && state.markers.length > 0;
 
   const exportPoster = useCallback(
-    async (format: "png" | "pdf") => {
+    async (format: "png" | "pdf" | "svg") => {
       const map = mapRef.current;
       if (!map) {
         dispatch({ type: "SET_ERROR", error: "Map is not ready." });
@@ -56,6 +57,37 @@ export function useExport() {
 
         const size = resolveCanvasSize(widthInches, heightInches, dpi);
 
+        const lat = Number(form.latitude) || 0;
+        const lon = Number(form.longitude) || 0;
+
+        if (format === "svg") {
+          const svgBlob = await createLayeredSvgBlobFromMap({
+            map,
+            exportWidth: size.width,
+            exportHeight: size.height,
+            theme: effectiveTheme,
+            center: { lat, lon },
+            displayCity: form.displayCity || form.location || "",
+            displayCountry: form.displayCountry || "",
+            fontFamily: form.fontFamily.trim(),
+            showPosterText: form.showPosterText,
+            showOverlay: form.showMarkers,
+            includeCredits: form.includeCredits,
+            markers: hasVisibleMarkers ? state.markers : [],
+            markerIcons: hasVisibleMarkers
+              ? getAllMarkerIcons(state.customMarkerIcons)
+              : [],
+          });
+          const svgFilename = createPosterFilename(
+            form.displayCity || form.location,
+            form.theme,
+            "svg",
+          );
+          triggerDownloadBlob(svgBlob, svgFilename);
+          dispatch({ type: "FINISH_EXPORT" });
+          return;
+        }
+
         // 1. Capture map at full export resolution
         const {
           canvas: mapCanvas,
@@ -63,17 +95,9 @@ export function useExport() {
           markerScaleX,
           markerScaleY,
           markerSizeScale,
-        } =
-          await captureMapAsCanvas(
-          map,
-          size.width,
-          size.height,
-          );
+        } = await captureMapAsCanvas(map, size.width, size.height);
 
         // 2. Composite fades + text
-        const lat = Number(form.latitude) || 0;
-        const lon = Number(form.longitude) || 0;
-
         const { canvas } = await compositeExport(mapCanvas, {
           theme: effectiveTheme,
           center: { lat, lon },
@@ -140,5 +164,10 @@ export function useExport() {
     [exportPoster],
   );
 
-  return { handleDownloadPng, handleDownloadPdf };
+  const handleDownloadSvg = useCallback(
+    () => exportPoster("svg"),
+    [exportPoster],
+  );
+
+  return { handleDownloadPng, handleDownloadPdf, handleDownloadSvg };
 }
