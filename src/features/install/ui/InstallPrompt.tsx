@@ -2,6 +2,7 @@ import useInstallPrompt from "../application/useInstallPrompt";
 import { FaMobileAlt as MobileIcon } from "react-icons/fa";
 import { FiShare as ShareIcon } from "react-icons/fi";
 import React, { useState } from "react";
+import { INSTALL_DIAGNOSTICS_ENABLED } from "@/core/config";
 
 export default function InstallPrompt() {
   const {
@@ -44,16 +45,18 @@ export default function InstallPrompt() {
             >
               Maybe later
             </button>
-            <button
-              type="button"
-              className="install-prompt-dismiss"
-              onClick={() => setIsDiagnosticsOpen(true)}
-            >
-              Diagnostics
-            </button>
+            {INSTALL_DIAGNOSTICS_ENABLED ? (
+              <button
+                type="button"
+                className="install-prompt-dismiss"
+                onClick={() => setIsDiagnosticsOpen(true)}
+              >
+                Diagnostics
+              </button>
+            ) : null}
           </div>
         </div>
-        {isDiagnosticsOpen ? (
+        {INSTALL_DIAGNOSTICS_ENABLED && isDiagnosticsOpen ? (
           <DiagnosticsModal
             diagnosticsText={diagnosticsText}
             onClose={() => setIsDiagnosticsOpen(false)}
@@ -87,16 +90,18 @@ export default function InstallPrompt() {
             >
               Maybe later
             </button>
-            <button
-              type="button"
-              className="install-prompt-dismiss"
-              onClick={() => setIsDiagnosticsOpen(true)}
-            >
-              Diagnostics
-            </button>
+            {INSTALL_DIAGNOSTICS_ENABLED ? (
+              <button
+                type="button"
+                className="install-prompt-dismiss"
+                onClick={() => setIsDiagnosticsOpen(true)}
+              >
+                Diagnostics
+              </button>
+            ) : null}
           </div>
         </div>
-        {isDiagnosticsOpen ? (
+        {INSTALL_DIAGNOSTICS_ENABLED && isDiagnosticsOpen ? (
           <DiagnosticsModal
             diagnosticsText={diagnosticsText}
             onClose={() => setIsDiagnosticsOpen(false)}
@@ -128,16 +133,18 @@ export default function InstallPrompt() {
             >
               Maybe later
             </button>
-            <button
-              type="button"
-              className="install-prompt-dismiss"
-              onClick={() => setIsDiagnosticsOpen(true)}
-            >
-              Diagnostics
-            </button>
+            {INSTALL_DIAGNOSTICS_ENABLED ? (
+              <button
+                type="button"
+                className="install-prompt-dismiss"
+                onClick={() => setIsDiagnosticsOpen(true)}
+              >
+                Diagnostics
+              </button>
+            ) : null}
           </div>
         </div>
-        {isDiagnosticsOpen ? (
+        {INSTALL_DIAGNOSTICS_ENABLED && isDiagnosticsOpen ? (
           <DiagnosticsModal
             diagnosticsText={diagnosticsText}
             onClose={() => setIsDiagnosticsOpen(false)}
