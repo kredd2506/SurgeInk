@@ -1,0 +1,108 @@
+/* ── Discharge Sparkline ── */
+
+.discharge-sparkline {
+  margin-top: 0.5rem;
+  padding: 0.625rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.discharge-sparkline--loading,
+.discharge-sparkline--error,
+.discharge-sparkline--empty {
+  font-size: 0.75rem;
+  color: var(--text-muted, #888);
+  text-align: center;
+  padding: 1rem 0.5rem;
+}
+
+.discharge-sparkline__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.375rem;
+}
+
+.discharge-sparkline__label {
+  font-size: 0.675rem;
+  color: var(--text-muted, #888);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.discharge-sparkline__value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a9eff;
+}
+
+/* ── Risk Score Card (floating overlay on map preview) ── */
+
+.risk-score-card {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  padding: 0.625rem 0.75rem;
+  min-width: 160px;
+  max-width: 240px;
+  pointer-events: none;
+}
+
+.risk-score-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.risk-score-card__row + .risk-score-card__row {
+  margin-top: 0.375rem;
+}
+
+.risk-score-card__label {
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.risk-score-card__value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.risk-score-card__value--muted {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+  font-size: 0.7rem;
+}
+
+.risk-score-card__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.risk-score-card__sublabel {
+  font-weight: 400;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.risk-score-card__subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.3;
+}

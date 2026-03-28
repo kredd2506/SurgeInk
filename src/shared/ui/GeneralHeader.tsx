@@ -15,7 +15,7 @@ export default function GeneralHeader({ onAboutOpen }: GeneralHeaderProps) {
           alt="TerraInk logo"
         />
         <div className="desktop-brand-copy brand-copy">
-          <h1 className="desktop-brand-title">TerraInk</h1>
+          <h1 className="desktop-brand-title">SurgeInk</h1>
           <p className="desktop-brand-kicker app-kicker">
             The Cartographic Poster Engine
           </p>

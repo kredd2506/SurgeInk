@@ -3,6 +3,7 @@ import {
   ThemeIcon,
   LayoutIcon,
   LayersIcon,
+  FloodIcon,
   MarkersIcon,
   StyleIcon,
   SettingsIcon,
@@ -14,6 +15,7 @@ export type MobileTab =
   | "layout"
   | "style"
   | "layers"
+  | "flood"
   | "markers";
 
 const tabs: {
@@ -26,6 +28,7 @@ const tabs: {
   { id: "layout", label: "Layout", Icon: LayoutIcon },
   { id: "style", label: "Style", Icon: StyleIcon },
   { id: "layers", label: "Layers", Icon: LayersIcon },
+  { id: "flood", label: "Flood", Icon: FloodIcon },
   { id: "markers", label: "Markers", Icon: MarkersIcon },
 ];
 

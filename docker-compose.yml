@@ -1,5 +1,5 @@
 services:
-  terraink:
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,3 +8,32 @@ services:
     ports:
       - "${APP_PORT:-7200}:80"
     restart: unless-stopped
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: surgeink-api:latest
+    container_name: surgeink-api
+    ports:
+      - "${SURGEINK_API_PORT:-8000}:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - SURGEINK_ENV=${SURGEINK_ENV:-development}
+      - SURGEINK_NOMINATIM_BASE_URL=${NOMINATIM_BASE_URL:-https://nominatim.openstreetmap.org}
+      - SURGEINK_OPENMETEO_BASE_URL=${OPENMETEO_BASE_URL:-https://flood-api.open-meteo.com}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: surgeink-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

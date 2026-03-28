@@ -41,3 +41,15 @@ updates.json
 
 # ignore agent setting files
 .claude/
+CLAUDE.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Old documentation
+old docs/

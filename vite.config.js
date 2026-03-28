@@ -66,6 +66,14 @@ export default defineConfig({
           }
 
           if (
+            packageName === "recharts" ||
+            packageName?.startsWith("d3-") ||
+            packageName === "victory-vendor"
+          ) {
+            return "vendor-recharts";
+          }
+
+          if (
             packageName === "react" ||
             packageName === "react-dom" ||
             packageName === "react-colorful"

@@ -671,6 +671,12 @@
     display: none;
   }
 
+  [data-desktop-tab="flood"]
+    .desktop-settings-slide
+    .mobile-section:not(.mobile-section--flood) {
+    display: none;
+  }
+
   [data-desktop-tab="markers"]
     .desktop-settings-slide
     .mobile-section:not(.mobile-section--markers) {

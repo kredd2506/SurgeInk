@@ -9,6 +9,7 @@ import { usePosterContext } from "./PosterContext";
 import { useMapSync } from "@/features/map/application/useMapSync";
 import MapPreview from "@/features/map/ui/MapPreview";
 import MarkerOverlay from "@/features/markers/ui/MarkerOverlay";
+import FloodMapOverlay from "@/features/flood/ui/FloodMapOverlay";
 import GradientFades from "./GradientFades";
 import PosterTextOverlay from "./PosterTextOverlay";
 import SettingsInfo from "./SettingsInfo";
@@ -435,6 +436,7 @@ export default function PreviewPanel() {
               onMarkerSizeChange={handleMarkerSizeChange}
             />
           ) : null}
+          <FloodMapOverlay mapRef={mapRef} lat={formLat} lng={formLon} />
           <PosterTextOverlay
             city={cityLabel}
             country={countryLabel}

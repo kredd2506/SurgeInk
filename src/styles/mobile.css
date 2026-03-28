@@ -1405,6 +1405,11 @@
     display: none;
   }
 
+  /* Flood tab: show only the flood section */
+  [data-mobile-tab="flood"] .mobile-section:not(.mobile-section--flood) {
+    display: none;
+  }
+
   /* Markers tab: show only the markers section */
   [data-mobile-tab="markers"] .mobile-section:not(.mobile-section--markers) {
     display: none;

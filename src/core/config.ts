@@ -39,6 +39,11 @@ export const DEFAULT_LON = 9.732;
 export const DEFAULT_CITY = "Hanover";
 export const DEFAULT_COUNTRY = "Germany";
 
+/* ── SurgeInk backend ── */
+
+export const SURGEINK_API_URL =
+  import.meta.env.VITE_SURGEINK_API_URL ?? "http://localhost:8000";
+
 export const REPO_URL = import.meta.env.VITE_REPO_URL ?? "";
 export const REPO_API_URL = import.meta.env.VITE_REPO_API_URL ?? "";
 export const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL ?? "";

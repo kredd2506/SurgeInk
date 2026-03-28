@@ -19,6 +19,18 @@ export const searchLocations = nominatim.searchLocations;
 export const geocodeLocation = nominatim.geocodeLocation;
 export const reverseGeocodeCoordinates = nominatim.reverseGeocode;
 
+/* ── Flood / SurgeInk API ── */
+
+import { createSurgeInkApiAdapter } from "@/features/flood/infrastructure/surgeinkApiAdapter";
+import { createFemaAdapter } from "@/features/flood/infrastructure/femaAdapter";
+
+const surgeinkApi = createSurgeInkApiAdapter(fetchAdapter);
+export const fetchForecast = surgeinkApi.fetchForecast;
+export const fetchFloodLayers = surgeinkApi.fetchLayers;
+
+const fema = createFemaAdapter(fetchAdapter);
+export const fetchFemaFloodZone = fema.fetchFloodZone;
+
 /* ── Fonts ── */
 
 export const ensureGoogleFont =
