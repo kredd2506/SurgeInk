@@ -31,6 +31,11 @@ export const fetchFloodLayers = surgeinkApi.fetchLayers;
 const fema = createFemaAdapter(fetchAdapter);
 export const fetchFemaFloodZone = fema.fetchFloodZone;
 
+import { createFemaGeoJsonAdapter } from "@/features/flood/infrastructure/femaGeoJsonAdapter";
+
+const femaGeoJson = createFemaGeoJsonAdapter(fetchAdapter);
+export const fetchFloodPolygons = femaGeoJson.fetchFloodPolygons;
+
 /* ── Fonts ── */
 
 export const ensureGoogleFont =

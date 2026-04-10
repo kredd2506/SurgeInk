@@ -38,3 +38,12 @@ export interface FemaFloodZone {
   isSfha: boolean;
   staticBfe: number | null;
 }
+
+export type BBox4 = [west: number, south: number, east: number, north: number];
+
+export interface FloodFillStyle {
+  fill: string;
+  fillOpacity: number;
+  stroke: string;
+  strokeOpacity: number;
+}

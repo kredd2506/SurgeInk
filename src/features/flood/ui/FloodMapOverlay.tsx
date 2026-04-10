@@ -1,5 +1,6 @@
 import type { MapInstanceRef } from "@/features/map/domain/types";
-import { useFemaOverlay } from "../application/useFemaOverlay";
+import { usePosterContext } from "@/features/poster/ui/PosterContext";
+import { useFloodVectorOverlay } from "../application/useFloodVectorOverlay";
 import { useFloodContext } from "./FloodContext";
 import RiskScoreCard from "./RiskScoreCard";
 
@@ -10,10 +11,16 @@ interface FloodMapOverlayProps {
 }
 
 export default function FloodMapOverlay({ mapRef, lat, lng }: FloodMapOverlayProps) {
-  const { visibility } = useFloodContext();
+  const { visibility, setFemaLoading, setFemaFeatureCount } = useFloodContext();
+  const { effectiveTheme } = usePosterContext();
 
-  // Manage FEMA raster tile layer on MapLibre
-  useFemaOverlay(mapRef, visibility.femaZones);
+  useFloodVectorOverlay(
+    mapRef,
+    visibility.femaZones,
+    effectiveTheme,
+    setFemaLoading,
+    setFemaFeatureCount,
+  );
 
   return (
     <RiskScoreCard
