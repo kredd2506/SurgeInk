@@ -1,11 +1,16 @@
 import { useEffect, useRef } from "react";
 import type { MapInstanceRef } from "@/features/map/domain/types";
 import { getCategoryColor } from "../domain/types";
+import {
+  BURN_IMAGE_IDS,
+  getBurnMarkCanvases,
+} from "../infrastructure/burnMarks";
 
 const SOURCE_ID = "eonet-disasters";
-const CHAR_LAYER_ID = "eonet-char";    // outer charred ring (dark, heavy blur)
-const FLAME_LAYER_ID = "eonet-flame";  // middle hot glow
-const CORE_LAYER_ID = "eonet-core";    // bright ignition center
+const BURN_LAYER_ID = "eonet-burn";      // wildfire burn marks (symbol)
+const CHAR_LAYER_ID = "eonet-char";      // non-fire outer dark ring
+const FLAME_LAYER_ID = "eonet-flame";    // non-fire hot glow
+const CORE_LAYER_ID = "eonet-core";      // non-fire bright center
 
 export function useDisasterOverlay(
   mapRef: MapInstanceRef,
@@ -13,10 +18,31 @@ export function useDisasterOverlay(
   data: GeoJSON.FeatureCollection | null,
 ) {
   const addedRef = useRef(false);
+  const imagesLoadedRef = useRef(false);
+
+  function ensureBurnImages(map: maplibregl.Map) {
+    if (imagesLoadedRef.current) return;
+    const canvases = getBurnMarkCanvases(128);
+    canvases.forEach((canvas, i) => {
+      const id = BURN_IMAGE_IDS[i];
+      if (map.hasImage(id)) return;
+      try {
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        map.addImage(id, imgData, { pixelRatio: 2 });
+      } catch (err) {
+        console.warn(`[DisasterOverlay] failed to add ${id}`, err);
+      }
+    });
+    imagesLoadedRef.current = true;
+  }
 
   function addLayers(map: maplibregl.Map) {
     if (addedRef.current) return;
     if (map.getSource(SOURCE_ID)) return;
+
+    ensureBurnImages(map);
 
     map.addSource(SOURCE_ID, {
       type: "geojson",
@@ -24,26 +50,28 @@ export function useDisasterOverlay(
     });
 
     const colorExpr = buildColorExpr();
-    const wildfireCharExpr = buildCharColorExpr();
 
-    // 1. Charred outer — heavy blur, dark burned color
+    // ── NON-FIRE events: stacked blurred circles ──
+    // Only visible for non-wildfire categories (volcanoes, storms, floods, etc.)
+
     map.addLayer({
       id: CHAR_LAYER_ID,
       type: "circle",
       source: SOURCE_ID,
+      filter: ["!=", ["get", "category"], "Wildfires"],
       paint: {
         "circle-radius": 22,
-        "circle-color": wildfireCharExpr,
+        "circle-color": buildCharColorExpr(),
         "circle-opacity": 0.35,
         "circle-blur": 1.2,
       },
     });
 
-    // 2. Hot glow middle — category color, soft blur
     map.addLayer({
       id: FLAME_LAYER_ID,
       type: "circle",
       source: SOURCE_ID,
+      filter: ["!=", ["get", "category"], "Wildfires"],
       paint: {
         "circle-radius": 11,
         "circle-color": colorExpr,
@@ -52,11 +80,11 @@ export function useDisasterOverlay(
       },
     });
 
-    // 3. Bright ignition core — crisp, small
     map.addLayer({
       id: CORE_LAYER_ID,
       type: "circle",
       source: SOURCE_ID,
+      filter: ["!=", ["get", "category"], "Wildfires"],
       paint: {
         "circle-radius": 3.5,
         "circle-color": "#fff5cc",
@@ -67,15 +95,51 @@ export function useDisasterOverlay(
       },
     });
 
+    // ── WILDFIRES: paper burn marks (symbol layer) ──
+    map.addLayer({
+      id: BURN_LAYER_ID,
+      type: "symbol",
+      source: SOURCE_ID,
+      filter: ["==", ["get", "category"], "Wildfires"],
+      layout: {
+        // Vary burn variant per feature (hash on id length mod 4)
+        "icon-image": [
+          "match",
+          ["%", ["length", ["to-string", ["coalesce", ["get", "id"], "fire"]]], 4],
+          0, BURN_IMAGE_IDS[0],
+          1, BURN_IMAGE_IDS[1],
+          2, BURN_IMAGE_IDS[2],
+          3, BURN_IMAGE_IDS[3],
+          BURN_IMAGE_IDS[0],
+        ] as any,
+        "icon-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          2, 0.6,
+          4, 0.9,
+          6, 1.3,
+          8, 1.8,
+          12, 2.5,
+        ],
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+        "icon-rotation-alignment": "map",
+      },
+      paint: {
+        "icon-opacity": 0.92,
+      },
+    });
+
     addedRef.current = true;
   }
 
   function removeLayers(map: maplibregl.Map) {
     if (!addedRef.current) return;
     try {
-      if (map.getLayer(CORE_LAYER_ID)) map.removeLayer(CORE_LAYER_ID);
-      if (map.getLayer(FLAME_LAYER_ID)) map.removeLayer(FLAME_LAYER_ID);
-      if (map.getLayer(CHAR_LAYER_ID)) map.removeLayer(CHAR_LAYER_ID);
+      for (const id of [BURN_LAYER_ID, CORE_LAYER_ID, FLAME_LAYER_ID, CHAR_LAYER_ID]) {
+        if (map.getLayer(id)) map.removeLayer(id);
+      }
       if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
     } catch { /* style may have been swapped */ }
     addedRef.current = false;
@@ -96,7 +160,9 @@ export function useDisasterOverlay(
     }
 
     function onStyleData() {
+      // Theme swaps wipe custom sources AND images — reload both
       addedRef.current = false;
+      imagesLoadedRef.current = false;
       if (visible && map && data) {
         setTimeout(() => {
           if (map && visible) addLayers(map);
@@ -150,12 +216,9 @@ function buildColorExpr(): any {
   ];
 }
 
-// Darker charred tone per category — wildfires get near-black scorch,
-// other disasters get a darker variant of their color
 function buildCharColorExpr(): any {
   return [
     "match", ["get", "category"],
-    "Wildfires", "#1a0d08",
     "Volcanoes", "#2b1608",
     "Severe Storms", "#1d0a2e",
     "Floods", "#082c4a",
