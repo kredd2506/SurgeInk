@@ -36,6 +36,13 @@ import { createFemaGeoJsonAdapter } from "@/features/flood/infrastructure/femaGe
 const femaGeoJson = createFemaGeoJsonAdapter(fetchAdapter);
 export const fetchFloodPolygons = femaGeoJson.fetchFloodPolygons;
 
+/* ── Disasters / EONET ── */
+
+import { createEonetAdapter } from "@/features/disaster/infrastructure/eonetAdapter";
+
+const eonet = createEonetAdapter(fetchAdapter);
+export const fetchDisasterEvents = eonet.fetchEvents;
+
 /* ── Fonts ── */
 
 export const ensureGoogleFont =

@@ -1410,6 +1410,11 @@
     display: none;
   }
 
+  /* Disaster tab: show only the disaster section */
+  [data-mobile-tab="disaster"] .mobile-section:not(.mobile-section--disaster) {
+    display: none;
+  }
+
   /* Markers tab: show only the markers section */
   [data-mobile-tab="markers"] .mobile-section:not(.mobile-section--markers) {
     display: none;

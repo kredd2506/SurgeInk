@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { PosterProvider } from "@/features/poster/ui/PosterContext";
 import { FloodProvider } from "@/features/flood/ui/FloodContext";
+import { DisasterProvider } from "@/features/disaster/ui/DisasterContext";
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -13,7 +14,9 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <PosterProvider>
-      <FloodProvider>{children}</FloodProvider>
+      <FloodProvider>
+        <DisasterProvider>{children}</DisasterProvider>
+      </FloodProvider>
     </PosterProvider>
   );
 }

@@ -53,3 +53,6 @@ __pycache__/
 
 # Old documentation
 old docs/
+
+# Playwright test captures (generated via scripts/capture-*.mjs)
+test-captures/

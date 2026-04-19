@@ -10,6 +10,7 @@ import { useMapSync } from "@/features/map/application/useMapSync";
 import MapPreview from "@/features/map/ui/MapPreview";
 import MarkerOverlay from "@/features/markers/ui/MarkerOverlay";
 import FloodMapOverlay from "@/features/flood/ui/FloodMapOverlay";
+import DisasterMapOverlay from "@/features/disaster/ui/DisasterMapOverlay";
 import GradientFades from "./GradientFades";
 import PosterTextOverlay from "./PosterTextOverlay";
 import SettingsInfo from "./SettingsInfo";
@@ -437,6 +438,7 @@ export default function PreviewPanel() {
             />
           ) : null}
           <FloodMapOverlay mapRef={mapRef} lat={formLat} lng={formLon} />
+          <DisasterMapOverlay mapRef={mapRef} />
           <PosterTextOverlay
             city={cityLabel}
             country={countryLabel}

@@ -11,6 +11,7 @@ import MapSettingsSection from "@/features/map/ui/MapSettingsSection";
 import LayersSection from "@/features/map/ui/LayersSection";
 import MarkersSection from "@/features/markers/ui/MarkersSection";
 import FloodSection from "@/features/flood/ui/FloodSection";
+import DisasterSection from "@/features/disaster/ui/DisasterSection";
 import TypographySection from "@/features/poster/ui/TypographySection";
 import {
   LocationIcon,
@@ -18,6 +19,7 @@ import {
   LayoutIcon,
   LayersIcon,
   FloodIcon,
+  DisasterIcon,
   MarkersIcon,
   StyleIcon,
   ChevronDownIcon,
@@ -38,6 +40,7 @@ type SectionId =
   | "layout"
   | "layers"
   | "flood"
+  | "disaster"
   | "markers"
   | "style";
 
@@ -51,6 +54,7 @@ const accordionSections: {
   { id: "layout", label: "Layout", Icon: LayoutIcon },
   { id: "layers", label: "Layers", Icon: LayersIcon },
   { id: "flood", label: "Flood", Icon: FloodIcon },
+  { id: "disaster", label: "Disaster", Icon: DisasterIcon },
   { id: "markers", label: "Markers", Icon: MarkersIcon },
   { id: "style", label: "Style", Icon: StyleIcon },
 ];
@@ -265,12 +269,31 @@ export default function SettingsPanel({
       </div>
 
       <div
+        className={`mobile-section mobile-section--disaster accordion-item${openSections.has("disaster") ? " accordion-item--open" : ""}`}
+      >
+        <AccordionHeader
+          sectionId="disaster"
+          label={accordionSections[5].label}
+          Icon={accordionSections[5].Icon}
+          isOpen={openSections.has("disaster")}
+          onToggle={toggleSection}
+        />
+        <div
+          className={`accordion-body${openSections.has("disaster") ? " is-open" : ""}`}
+        >
+          <div className="accordion-body-inner">
+            {!isAuxEditorActive ? <DisasterSection /> : null}
+          </div>
+        </div>
+      </div>
+
+      <div
         className={`mobile-section mobile-section--markers accordion-item${openSections.has("markers") ? " accordion-item--open" : ""}`}
       >
         <AccordionHeader
           sectionId="markers"
-          label={accordionSections[5].label}
-          Icon={accordionSections[5].Icon}
+          label={accordionSections[6].label}
+          Icon={accordionSections[6].Icon}
           isOpen={openSections.has("markers")}
           onToggle={toggleSection}
         />
@@ -288,8 +311,8 @@ export default function SettingsPanel({
       >
         <AccordionHeader
           sectionId="style"
-          label={accordionSections[6].label}
-          Icon={accordionSections[6].Icon}
+          label={accordionSections[7].label}
+          Icon={accordionSections[7].Icon}
           isOpen={openSections.has("style")}
           onToggle={toggleSection}
         />

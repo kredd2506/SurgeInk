@@ -7,8 +7,9 @@ import { buildZoneMatchExpressions } from "../domain/floodColors";
 import { FEMA_GEOJSON_DEBOUNCE_MS } from "../infrastructure/constants";
 
 const SOURCE_ID = "fema-flood-geojson";
-const FILL_LAYER_ID = "fema-flood-fill";
-const LINE_LAYER_ID = "fema-flood-outline";
+const HALO_LAYER_ID = "fema-flood-halo";     // outer ink bleed (soft, diffuse)
+const FILL_LAYER_ID = "fema-flood-fill";     // core wash
+const EDGE_LAYER_ID = "fema-flood-edge";     // inner concentration line
 
 const EMPTY_FC: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
 
@@ -46,6 +47,23 @@ export function useFloodVectorOverlay(
       }
     }
 
+    // 1. Outer halo — wide blurred line rendered on polygon outline (ink seep)
+    map.addLayer(
+      {
+        id: HALO_LAYER_ID,
+        type: "line",
+        source: SOURCE_ID,
+        paint: {
+          "line-color": exprs.fillColor as any,
+          "line-width": 18,
+          "line-blur": 14,
+          "line-opacity": 0.35,
+        },
+      },
+      beforeId,
+    );
+
+    // 2. Core fill — the ink body
     map.addLayer(
       {
         id: FILL_LAYER_ID,
@@ -59,15 +77,17 @@ export function useFloodVectorOverlay(
       beforeId,
     );
 
+    // 3. Inner edge — concentrated outline where ink pools
     map.addLayer(
       {
-        id: LINE_LAYER_ID,
+        id: EDGE_LAYER_ID,
         type: "line",
         source: SOURCE_ID,
         paint: {
           "line-color": exprs.lineColor,
-          "line-opacity": exprs.lineOpacity,
-          "line-width": 0.8,
+          "line-width": 1.2,
+          "line-blur": 0.5,
+          "line-opacity": 0.6,
         },
       },
       beforeId,
@@ -79,8 +99,9 @@ export function useFloodVectorOverlay(
   function removeLayers(map: maplibregl.Map) {
     if (!addedRef.current) return;
     try {
+      if (map.getLayer(EDGE_LAYER_ID)) map.removeLayer(EDGE_LAYER_ID);
       if (map.getLayer(FILL_LAYER_ID)) map.removeLayer(FILL_LAYER_ID);
-      if (map.getLayer(LINE_LAYER_ID)) map.removeLayer(LINE_LAYER_ID);
+      if (map.getLayer(HALO_LAYER_ID)) map.removeLayer(HALO_LAYER_ID);
       if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
     } catch { /* style may have been swapped */ }
     addedRef.current = false;
@@ -104,7 +125,6 @@ export function useFloodVectorOverlay(
         dataRef.current = fc;
         onFeatureCount?.(fc.features.length);
 
-        // Ensure source exists before setting data
         if (!map.getSource(SOURCE_ID)) {
           addLayers(map);
         }
@@ -142,7 +162,6 @@ export function useFloodVectorOverlay(
     }
 
     function onStyleData() {
-      // Theme changes wipe all custom sources — re-add
       addedRef.current = false;
       if (visible && map) {
         setTimeout(() => {
@@ -178,18 +197,20 @@ export function useFloodVectorOverlay(
 
     try {
       const exprs = buildZoneMatchExpressions(theme);
+      if (map.getLayer(HALO_LAYER_ID)) {
+        map.setPaintProperty(HALO_LAYER_ID, "line-color", exprs.fillColor as any);
+      }
       if (map.getLayer(FILL_LAYER_ID)) {
         map.setPaintProperty(FILL_LAYER_ID, "fill-color", exprs.fillColor as any);
         map.setPaintProperty(FILL_LAYER_ID, "fill-opacity", exprs.fillOpacity as any);
       }
-      if (map.getLayer(LINE_LAYER_ID)) {
-        map.setPaintProperty(LINE_LAYER_ID, "line-color", exprs.lineColor);
-        map.setPaintProperty(LINE_LAYER_ID, "line-opacity", exprs.lineOpacity);
+      if (map.getLayer(EDGE_LAYER_ID)) {
+        map.setPaintProperty(EDGE_LAYER_ID, "line-color", exprs.lineColor);
       }
     } catch { /* layer may not exist yet */ }
   }, [theme, mapRef]);
 
-  // Cleanup on unmount
+  // Cleanup
   useEffect(() => {
     return () => {
       const map = mapRef.current;
