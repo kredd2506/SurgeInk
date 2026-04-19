@@ -1,145 +1,190 @@
-![](./public/assets/banner.png)
+# SurgeInk
 
-# TerraInk
+> **Multi-hazard risk visualization engine.** Render FEMA flood zones as ink bleeds and NASA EONET wildfires as paper burn marks on themed cartographic posters.
 
-[![Website Badge](https://img.shields.io/badge/Website-fff?logo=appveyor&logoColor=000&style=for-the-badge)](https://terraink.app)
-[![Email Badge](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=fff&style=for-the-badge)](mailto:hello@terraink.app)
-[![LinkedIn Badge](https://img.shields.io/badge/LinkedIn-0A66C2?logo=linkedin&logoColor=fff&style=for-the-badge)](https://www.linkedin.com/company/terraink/)
-[![Instagram](https://img.shields.io/badge/Instagram-E4405F?logo=instagram&logoColor=fff&style=for-the-badge)](https://instagram.com/terraink.app)
-[![YouTube](https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=fff&style=for-the-badge)](https://www.youtube.com/@terrainkapp)
-[![Threads](https://img.shields.io/badge/Threads-000?logo=threads&logoColor=fff&style=for-the-badge)](https://www.threads.net/@terraink.app)
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?logo=reddit&logoColor=fff&style=for-the-badge)](https://www.reddit.com/r/terraink)
-[![TikTok](https://img.shields.io/badge/TikTok-000?logo=tiktok&logoColor=fff&style=for-the-badge)](https://www.tiktok.com/@terraink.app)
-[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-DA552F?logo=producthunt&logoColor=fff&style=for-the-badge)](https://www.producthunt.com/products/terraink)
+[![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000&style=for-the-badge)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=fff&style=for-the-badge)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-9135FF?logo=vite&logoColor=fff&style=for-the-badge)](https://vitejs.dev)
+[![MapLibre](https://img.shields.io/badge/MapLibre-000?logo=maplibre&logoColor=fff&style=for-the-badge)](https://maplibre.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=fff&style=for-the-badge)](https://fastapi.tiangolo.com)
+[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge)](https://www.python.org)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=for-the-badge)](https://www.docker.com)
 
-[![Bun Badge](https://img.shields.io/badge/Bun-000?logo=bun&logoColor=fff&style=for-the-badge)](https://bun.sh)
-[![Vite Badge](https://img.shields.io/badge/Vite-9135FF?logo=vite&logoColor=fff&style=for-the-badge)](https://vitejs.dev)
-[![React Badge](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000&style=for-the-badge)](https://react.dev/)
-[![JavaScript Badge](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000&style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![TypeScript Badge](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=fff&style=for-the-badge)](https://www.typescriptlang.org)
-[![OpenStreetMap Badge](https://img.shields.io/badge/OpenStreetMap-7EBC6F?logo=openstreetmap&logoColor=fff&style=for-the-badge)](https://www.openstreetmap.org)
-[![MapLibre Badge](https://img.shields.io/badge/MapLibre-000?logo=maplibre&logoColor=fff&style=for-the-badge)](https://maplibre.org/)
-[![GitHub Badge](https://img.shields.io/badge/GitHub-fff?logo=github&logoColor=000&style=for-the-badge)](https://github.com/yousifamanuel/terraink)
-[![Cloudflare Badge](https://img.shields.io/badge/Cloudflare-F38020?logo=cloudflare&logoColor=fff&style=for-the-badge)](https://www.cloudflare.com)
-[![Docker Badge](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=for-the-badge)](https://www.docker.com)
+SurgeInk extends [TerraInk](https://github.com/yousifamanuel/terraink)'s cartographic poster engine with real flood and disaster data. Pick any location, turn on a hazard layer, and the map transforms — flood zones soak into the paper like spilled ink, wildfires burn through as charred holes.
 
-> Note: TerraInk is still in development. Every feedback is appreciated. This is a for-fun, open-source project, and community contributions are very welcome.
+## What makes it different
 
-## Acknowledgment
+Unlike typical GIS overlays that drop generic red polygons and glowing dots onto a map, SurgeInk treats hazards as **physical media marks on paper**:
 
-This project is a JavaScript reimplementation inspired by the original MapToPoster [originalankur/maptoposter](https://github.com/originalankur/maptoposter) by [Ankur Gupta](https://github.com/originalankur) (MIT license). My app is built using Bun, React, and TypeScript. It allows users to create custom city map posters with various styling options, leveraging OpenStreetMap data rendered via MapLibre and OpenFreeMap vector tiles.
+- **Floods** render as soft ink bleeds — a 3-layer stack of blurred halo + core wash + concentrated edge, colors derived from the active theme so water always looks like it belongs
+- **Wildfires** render as organic paper burn marks — procedurally generated canvas textures with charred black centers, ember rings, and scattered ash flecks
+- All other disaster types use a layered glow effect appropriate to the event kind
 
-## Features
-
-- **Custom city map posters** for any location in the world, powered by real OpenStreetMap data
-- **Smart geocoding** — search for any city or region by name, or enter coordinates manually
-- **Rich theme system** — choose from dozens of curated themes or build your own custom color palette
-- **Detailed map layers** — roads, water bodies, parks, and building footprints with per-layer styling
-- **Typography controls** — set city/country display labels and load any Google Fonts family
-- **High-resolution PNG export** — download a print-ready poster at any defined dimension
-
-## Data Providers and Mapping Stack
-
-- **Map data**: [OpenStreetMap contributors](https://www.openstreetmap.org/copyright)
-- **Tiles**: [OpenMapTiles](https://openmaptiles.org/)
-- **Tile hosting**: [OpenFreeMap](https://openfreemap.org/)
-- **Geocoding**: [Nominatim](https://nominatim.openstreetmap.org/)
-- **Map renderer**: [MapLibre](https://maplibre.org/)
-
-## User Interface
-
-![](./public/assets/screenshots/Web_UI.png)
+---
 
 ## Showcase
 
-All showcase images are stored in `public/assets/showcase/`.
+### Flood — ink bleed effect
+FEMA flood zones along the Gulf Coast, rendered as organic ink wash on the Heatwave theme. Colors adapt to the active palette.
 
-### Featured Examples
+![Flood ink bleed](public/assets/surgeink/flood-ink-bleed.png)
 
-<p align="center">
-  <img src="./public/assets/showcase/showcase_1.png" alt="Featured showcase example 1" width="100%" />
-  <img src="./public/assets/showcase/showcase_2.png" alt="Featured showcase example 2" width="100%" />
-</p>
+### Wildfires — paper burn marks
+NASA EONET wildfire events across the southern US, rendered as charred holes burned through the poster.
 
-## Run
+![Wildfire burn marks](public/assets/surgeink/disasters-burn-marks.png)
 
-```bash
-bun install
-bun run dev
+### Combined
+Both layers active on a dark theme.
+
+![Combined hazards](public/assets/surgeink/combined.png)
+
+---
+
+## Features
+
+- **Multi-hazard overlays** — flood zones (FEMA NFHL), disasters (NASA EONET), river discharge (Open-Meteo)
+- **Theme-adaptive rendering** — hazard colors derive from the active map theme, never clash with the base cartography
+- **Procedural effects** — canvas-rendered burn marks with seeded variants, multi-octave noise, Catmull-Rom smoothing
+- **Live data** — all sources free and public, no API keys required
+- **Risk score card** — floating summary of FEMA zone + live discharge for the current location
+- **Discharge sparkline** — 7-day river discharge forecast, chartable via recharts
+- **All of TerraInk** — themes, layouts, markers, typography, high-res PNG/SVG/PDF export
+
+## Data sources
+
+| Source | What it provides | Access |
+|---|---|---|
+| [FEMA NFHL](https://www.fema.gov/flood-maps/national-flood-hazard-layer) | US flood zones (AE, VE, X, etc.) | Free ArcGIS REST, proxied through the SurgeInk backend for CORS |
+| [NASA EONET v3](https://eonet.gsfc.nasa.gov/) | Active disasters — wildfires, storms, volcanoes, floods, earthquakes, landslides | Free, no auth, proxied with 10 min cache |
+| [Open-Meteo Flood API](https://open-meteo.com/en/docs/flood-api) | River discharge forecasts (wraps GloFAS v4) | Free, no auth, proxied with 6 hr cache |
+| [OpenStreetMap](https://www.openstreetmap.org) | Base map data | Via MapLibre + OpenFreeMap |
+| [Nominatim](https://nominatim.openstreetmap.org) | Location search / geocoding | Proxied via backend |
+
+## Tech stack
+
+**Frontend:** React 18 · TypeScript · Vite · MapLibre GL · recharts · Bun/npm
+
+**Backend:** Python 3.11 · FastAPI · httpx · Redis (optional cache, graceful degradation)
+
+**Architecture:** Feature-based vertical slices with hexagonal/ports-and-adapters pattern. See [agent.md](./agent.md) for details.
+
+## Architecture
+
+Monorepo. Frontend at root, Python backend in `server/`.
+
+```
+surgeink/
+├── src/
+│   ├── core/                     # Ports, adapters, config, services
+│   ├── features/
+│   │   ├── poster/               # Core state (PosterContext)
+│   │   ├── location/             # Geocoding, search
+│   │   ├── map/                  # MapLibre rendering
+│   │   ├── theme/                # Color themes
+│   │   ├── flood/                # FEMA flood zones (ink bleed)
+│   │   └── disaster/             # NASA EONET events (burn marks)
+│   ├── shared/                   # Geo math, utils, UI atoms
+│   └── styles/                   # Global CSS
+├── server/
+│   └── surgeink/
+│       ├── main.py               # FastAPI app
+│       ├── api/                  # Route handlers
+│       ├── data/                 # External API clients
+│       └── cache/                # Redis wrapper
+├── scripts/                      # Playwright capture scripts
+└── docker-compose.yml            # Full stack (frontend + api + redis)
 ```
 
-## Environment
+## Run locally
 
-Check [`.env.example`](./.env.example) for available variables. They are optional for most local work and should not be set during testing unless a specific case requires them.
-
-## Build
+### Frontend
 
 ```bash
-bun run build
+bun install    # (or npm install)
+bun run dev    # → http://localhost:5173
 ```
 
-## Deploy with Docker (Self-Hosting)
+### Backend
 
-### 1) Build and run with Docker Compose
+```bash
+cd server
+pip install -r requirements.txt
+uvicorn surgeink.main:app --host 127.0.0.1 --port 8000
+```
 
-Create `.env` from `.env.example` (or set `APP_PORT` directly in your shell), then run:
+Backend runs at `http://localhost:8000`. Swagger docs at `/api/docs`.
+
+Set `VITE_SURGEINK_API_URL=http://localhost:8000` in your `.env` if the backend is not on the default port.
+
+### Redis (optional)
+
+The backend uses Redis for caching but degrades gracefully if it's unreachable. For local dev you can skip it entirely. In production:
+
+```bash
+docker run -d -p 6379:6379 redis:7-alpine
+```
+
+## Docker deployment
 
 ```bash
 docker compose up -d --build
 ```
 
-This serves the app on `http://localhost:7200` by default.
+Starts three services:
+- **frontend** on `http://localhost:7200` (nginx serving built Vite app)
+- **api** on `http://localhost:8000` (FastAPI)
+- **redis** on `localhost:6379` (caching layer)
 
-To change the exposed host port:
-
-- Linux/macOS:
-
-```bash
-APP_PORT=80 docker compose up -d --build
-```
-
-- PowerShell:
-
-```powershell
-$env:APP_PORT=80
-docker compose up -d --build
-```
-
-### 2) Stop the deployment
+Stop:
 
 ```bash
 docker compose down
 ```
 
-### 3) Optional: build and run without Compose
+## Environment variables
 
-```bash
-docker build -t terraink:latest .
-docker run -d --name terraink -p 7200:80 --restart unless-stopped terraink:latest
-```
+See [`.env.example`](./.env.example) for all available variables.
 
-## Contributing
+**Frontend:**
+- `VITE_SURGEINK_API_URL` — backend URL (defaults to `http://localhost:8000`)
 
-> The contribution guidelines are meant to keep TerraInk easy to extend, review, and maintain over time. They are here to support a durable architecture, not to add unnecessary friction.
+**Backend:**
+- `SURGEINK_ENV` — `development` or `production`
+- `SURGEINK_API_PORT` — default `8000`
+- `REDIS_URL` — optional, defaults to `redis://redis:6379/0` in Docker
 
-Read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a PR.
+## Backend API
 
-- Branch from `dev` and target `dev` only. Do not open PRs against `main`.
-- Fill out the pull request template completely when you open a PR.
-- Keep contributions clean, modular, and aligned with the existing architecture.
-- Avoid hard-coded values when constants, configuration, or reusable abstractions are more appropriate.
-- AI-assisted coding is allowed, but submissions must be reviewed, refined, and intentionally engineered before review.
+| Endpoint | Status | Description |
+|---|---|---|
+| `GET /api/health` | Working | Health check |
+| `GET /api/v1/geocode` | Working | Nominatim proxy |
+| `GET /api/v1/forecast` | Working | Open-Meteo river discharge |
+| `GET /api/v1/layers` | Working | Layer catalog |
+| `GET /api/v1/fema/zones` | Working | FEMA flood zones as GeoJSON |
+| `GET /api/v1/disasters` | Working | NASA EONET events as GeoJSON |
+| `GET /api/v1/risk` | Stub | Composite risk (Phase 3) |
+| `POST /api/v1/predict` | Stub | ML inference (Phase 4) |
+| `GET /api/v1/interpret` | Stub | Model interpretability (Phase 4) |
 
-## Star History
+## Roadmap
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yousifamanuel/terraink&type=Date)](https://star-history.com/#yousifamanuel/terraink&Date)
+- [x] Phase 1 — FastAPI skeleton + Open-Meteo + Nominatim + layer catalog
+- [x] Phase 2 — FEMA flood zones with ink-bleed rendering
+- [x] Phase 3 — NASA EONET disasters with paper burn marks
+- [ ] Phase 4 — Composite risk scoring endpoint
+- [ ] Phase 5 — ML flood risk prediction + interpretability layer
+- [ ] Phase 6 — JRC Global Surface Water + WRI Aqueduct climate scenarios (via Google Earth Engine)
+
+See [SURGEINK_SPEC.md](./SURGEINK_SPEC.md) for the full technical spec.
+
+## Acknowledgment
+
+SurgeInk is built on top of [TerraInk](https://github.com/yousifamanuel/terraink) by [Yousif Amanuel](https://github.com/yousifamanuel) (MIT). TerraInk provides the cartographic poster engine — themes, layouts, map rendering, export. SurgeInk adds the hazard visualization layers, Python backend, and live data integration.
+
+TerraInk itself is inspired by [MapToPoster](https://github.com/originalankur/maptoposter) by [Ankur Gupta](https://github.com/originalankur) (MIT).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Trademark
-
-The **Terraink™** name, logo, and branding assets are trademarks of the project owner.</br>
-The MIT license grants you the right to use the code, but it does **not** grant any rights to use the project's name or branding for your own commercial purposes or hosted services.</br>
-See [TRADEMARK.md](./TRADEMARK.md) for details.
+MIT — see [LICENSE](./LICENSE).
