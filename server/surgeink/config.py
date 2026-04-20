@@ -21,11 +21,14 @@ class Settings(BaseSettings):
     fema_nfhl_base_url: str = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer"
     openfema_base_url: str = "https://www.fema.gov/api/open/v2"
 
-    # CORS
-    cors_origins: list[str] = [
-        "http://localhost:5173",
-        "http://localhost:7200",
-    ]
+    # CORS — comma-separated origins via SURGEINK_CORS_ORIGINS env var.
+    # Defaults cover local dev. In production set e.g.
+    # "https://surgeink.pages.dev,https://*.surgeink.pages.dev"
+    cors_origins: str = "http://localhost:5173,http://localhost:7200"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
 
 settings = Settings()
