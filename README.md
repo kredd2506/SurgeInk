@@ -2,6 +2,10 @@
 
 > **Multi-hazard risk visualization engine.** Render FEMA flood zones as ink bleeds and NASA EONET wildfires as paper burn marks on themed cartographic posters.
 
+### 🚀 [Try it live → surgeink.pages.dev](https://surgeink.pages.dev)
+
+API: [`kredd25-surgeink-api.hf.space`](https://kredd25-surgeink-api.hf.space) · Docs: [`/api/docs`](https://kredd25-surgeink-api.hf.space/api/docs)
+
 [![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000&style=for-the-badge)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=fff&style=for-the-badge)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-9135FF?logo=vite&logoColor=fff&style=for-the-badge)](https://vitejs.dev)
@@ -9,6 +13,8 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=fff&style=for-the-badge)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge)](https://www.python.org)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=for-the-badge)](https://www.docker.com)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-F38020?logo=cloudflare&logoColor=fff&style=for-the-badge)](https://pages.cloudflare.com)
+[![Hugging Face](https://img.shields.io/badge/HF%20Spaces-FFD21E?logo=huggingface&logoColor=000&style=for-the-badge)](https://huggingface.co/spaces)
 
 SurgeInk extends [TerraInk](https://github.com/yousifamanuel/terraink)'s cartographic poster engine with real flood and disaster data. Pick any location, turn on a hazard layer, and the map transforms — flood zones soak into the paper like spilled ink, wildfires burn through as charred holes.
 
@@ -125,7 +131,7 @@ The backend uses Redis for caching but degrades gracefully if it's unreachable. 
 docker run -d -p 6379:6379 redis:7-alpine
 ```
 
-## Docker deployment
+## Docker deployment (self-host)
 
 ```bash
 docker compose up -d --build
@@ -141,6 +147,35 @@ Stop:
 ```bash
 docker compose down
 ```
+
+## Free hosted deployment (the live demo setup)
+
+**Total cost: $0/month.** SurgeInk runs entirely on free tiers:
+
+### Frontend → Cloudflare Pages
+1. Connect this repo at https://pages.cloudflare.com
+2. Build settings:
+   - Framework preset: **None**
+   - Build command: `npm install && npm run build`
+   - Build output: `dist`
+3. Environment variable: `VITE_SURGEINK_API_URL` → your backend URL
+
+Cloudflare Pages provides unlimited bandwidth and custom domain support on the free tier.
+
+### Backend → Hugging Face Spaces
+1. Create a Docker Space at https://huggingface.co/new-space
+   - SDK: **Docker** (Blank template)
+   - Hardware: CPU basic (free, always-on for public spaces)
+2. Push the `server/` directory as the Space root:
+   ```bash
+   git subtree split --prefix=server -b temp-hf
+   git push -f https://huggingface.co/spaces/<USER>/<SPACE> temp-hf:main
+   git branch -D temp-hf
+   ```
+
+`server/README.md` already includes the HF Spaces frontmatter (`sdk: docker`, `app_port: 8000`).
+
+CORS is pre-configured in `server/surgeink/main.py` to accept any `*.pages.dev` and `*.hf.space` origin via regex.
 
 ## Environment variables
 
@@ -164,9 +199,9 @@ See [`.env.example`](./.env.example) for all available variables.
 | `GET /api/v1/layers` | Working | Layer catalog |
 | `GET /api/v1/fema/zones` | Working | FEMA flood zones as GeoJSON |
 | `GET /api/v1/disasters` | Working | NASA EONET events as GeoJSON |
-| `GET /api/v1/risk` | Stub | Composite risk (Phase 3) |
-| `POST /api/v1/predict` | Stub | ML inference (Phase 4) |
-| `GET /api/v1/interpret` | Stub | Model interpretability (Phase 4) |
+| `GET /api/v1/risk` | Stub | Composite risk (Phase 4) |
+| `POST /api/v1/predict` | Stub | ML inference (Phase 5) |
+| `GET /api/v1/interpret` | Stub | Model interpretability (Phase 5) |
 
 ## Roadmap
 
